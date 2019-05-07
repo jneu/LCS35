@@ -13,9 +13,8 @@ public class Main {
 
 		System.out.println("brute force: " + new Date());
 
-		while (t > 0) {
+		while (t-- > 0) {
 			w = w.multiply(w).mod(n);
-			t--;
 		}
 
 		System.out.println("brute force: " + new Date());
@@ -33,15 +32,13 @@ public class Main {
 
 		System.out.println("montgomery: " + new Date());
 
-		while (t > 0) {
+		while (t-- > 0) {
 			w = w.multiply(w);
 			w = w.and(r_mask).multiply(n_prime).and(r_mask).multiply(n).add(w).shiftRight(k);
 			BigInteger w_smaller = w.subtract(n);
 			if (w_smaller.signum() >= 0) {
 				w = w_smaller;
 			}
-
-			t--;
 		}
 
 		w = w.and(r_mask).multiply(n_prime).and(r_mask).multiply(n).add(w).shiftRight(k);
