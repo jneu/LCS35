@@ -86,27 +86,29 @@ validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
       printf ("p * q is not equal to n\n");
       exit (EXIT_FAILURE);
     }
+
+  mpz_clears (gcd, pq, NULL);
 }
 
 static void
 run_challenge (uint64_t t, mpz_t * p, mpz_t * q, mpz_t * n, mpz_t * w)
 {
-  mpz_t two;
   mpz_t p_minus_1, q_minus_1, phi;
-  mpz_t tmp;
+  mpz_t two, tmp;
 
-  mpz_inits (two, p_minus_1, q_minus_1, phi, tmp, NULL);
+  mpz_inits (p_minus_1, q_minus_1, phi, two, tmp, NULL);
 
-  mpz_set_ui (two, 2);
-
-  /* Compute the Euler totient of p * q */
+  /* Compute the Euler totient of p * q, assuming both are prime */
   mpz_sub_ui (p_minus_1, *p, 1);
   mpz_sub_ui (q_minus_1, *q, 1);
   mpz_mul (phi, p_minus_1, q_minus_1);
 
   /* Use Euler's Theorem to compute the challenge value */
+  mpz_set_ui (two, 2);
   mpz_powm_ui (tmp, two, t, phi);
   mpz_powm (*w, two, tmp, *n);
+
+  mpz_clears (two, p_minus_1, q_minus_1, phi, tmp, NULL);
 }
 
 void
@@ -121,6 +123,8 @@ print_message (mpz_t * z, mpz_t * w)
   printf ("message:\n");
   mpz_out_str (stdout, 10, message);
   printf ("\n");
+
+  mpz_clear (message);
 }
 
 int
@@ -130,6 +134,7 @@ main (void)
   mpz_t n, z, p, q, w;
   uint64_t t = T;
 
+  /* Initialize the challenge values */
   mpz_inits (n, z, p, q, w, NULL);
 
   rv = mpz_set_str (n, N, 10);
@@ -143,9 +148,12 @@ main (void)
 
   validate_challenge (&n, &p, &q);
 
+  /* Now do the hard work of running the challenge */
   run_challenge (t, &p, &q, &n, &w);
-
   print_message (&z, &w);
+
+  /* Clean up */
+  mpz_clears (n, z, p, q, w, NULL);
 
   return EXIT_SUCCESS;
 }
