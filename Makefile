@@ -4,8 +4,9 @@ CC := gcc
 LD := gcc
 
 CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE
-CFLAGS += -O3
+CFLAGS += -O2 -flto
 LDFLAGS := -lgmp
+LDFLAGS += -O2 -flto
 
 TARGETS := lcs35 validate_challenge
 .PHONY: all
