@@ -7,24 +7,32 @@ CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE
 CFLAGS += -O3
 LDFLAGS := -lgmp
 
+TARGETS := lcs35 validate_challenge
 .PHONY: all
-all: validate_challenge lcs35
+all: $(TARGETS)
 
-validate_challenge.o:
-	$(CC) $(CFLAGS) -c validate_challenge.c
-lcs35.o:
-	$(CC) $(CFLAGS) -c lcs35.c
+L_OBJECTS := lcs35.o
+VC_OBJECTS := validate_challenge.o
+OBJECTS := $(L_OBJECTS) $(VC_OBJECTS)
+DEPS := $(patsubst %.o,%.d,$(OBJECTS))
+L_SOURCES := $(patsubst %.o,%.c,$(L_OBJECTS))
+VC_SOURCES := $(patsubst %.o,%.c,$(VC_OBJECTS))
 
-validate_challenge: validate_challenge.o
+$(OBJECTS): %.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+lcs35: $(L_OBJECTS)
 	$(LD) $(LDFLAGS) $^ -o $@
-lcs35: lcs35.o
+validate_challenge: $(VC_OBJECTS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 .PHONY: clean
 clean:
-	rm -f {lcs35,validate_challenge}{,.o,.d,.c~}
+	rm -f $(OBJECTS)
+	rm -f $(DEPS)
+	rm -f $(TARGETS)
 
--include validate_challenge.d lcs35.d
+-include $(DEPS)
 
 # @@@ build lcs35_montgomery
 # @@@ create an indent target
