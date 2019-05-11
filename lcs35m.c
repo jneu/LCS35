@@ -78,8 +78,6 @@ main (void)
   /* Get going */
   while (t-- > 0)
     {
-      mpz_mod (w, w, n);
-
       mpn_sqr (p_tmp2, p_tmp1, R_NUM_LIMBS);
 
       mpn_mul_n (p_tmp3, p_tmp2, p_n_prime, R_NUM_LIMBS);
