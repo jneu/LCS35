@@ -1,8 +1,5 @@
 #include "lcs35.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <gmp.h>
 
 static void
@@ -153,13 +150,13 @@ main (void)
   mpz_inits (n, z, p, q, w, NULL);
 
   rv = mpz_set_str (n, N, 10);
-  CHECK_RV (rv, "failed to set n\n");
+  CHECK_RV (rv, "failed to set n");
   rv = mpz_set_str (z, Z, 10);
-  CHECK_RV (rv, "failed to set z\n");
+  CHECK_RV (rv, "failed to set z");
   rv = mpz_set_str (p, P, 10);
-  CHECK_RV (rv, "failed to set p\n");
+  CHECK_RV (rv, "failed to set p");
   rv = mpz_set_str (q, Q, 10);
-  CHECK_RV (rv, "failed to set q\n");
+  CHECK_RV (rv, "failed to set q");
 
   validate_challenge (&n, &p, &q);
 

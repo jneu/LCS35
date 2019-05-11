@@ -1,8 +1,5 @@
 #include "lcs35.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <gmp.h>
 
 int
@@ -16,9 +13,9 @@ main (void)
   mpz_inits (n, z, w, w2, NULL);
 
   rv = mpz_set_str (n, N, 10);
-  CHECK_RV (rv, "failed to set n\n");
+  CHECK_RV (rv, "failed to set n");
   rv = mpz_set_str (z, Z, 10);
-  CHECK_RV (rv, "failed to set z\n");
+  CHECK_RV (rv, "failed to set z");
 
   mpz_set_ui (w, 2);
 
