@@ -3,9 +3,10 @@ SHELL := bash
 CC := gcc
 LD := gcc
 
-CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE
+CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE -g
 CFLAGS += -O2 -flto
-LDFLAGS := -lgmp
+LDFLAGS := -g
+LDFLAGS += -lgmp
 LDFLAGS += -O2 -flto
 
 TARGETS := lcs35 lcs35m validate_challenge

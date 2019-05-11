@@ -20,7 +20,7 @@ main (void)
   rv = mpz_set_str (z, Z, 10);
   CHECK_RV (rv, "failed to set z\n");
 
-  mpz_init_set_ui (w, 2);
+  mpz_set_ui (w, 2);
 
   /* Get going */
   while (t-- > 0)
