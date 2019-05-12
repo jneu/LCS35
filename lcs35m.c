@@ -1,9 +1,8 @@
 #include "lcs35.h"
+#include "print_challenge_message.h"
 
 #include <assert.h>
 #include <string.h>
-
-#include <gmp.h>
 
 /*
  * Pick the number of bits to use in the calculations
@@ -99,11 +98,7 @@ main (void)
   mpz_mod (w, w, n);
 
   /* Create and show the message */
-  mpz_xor (w, w, z);
-
-  printf ("message:\n");
-  mpz_out_str (stdout, 10, w);
-  printf ("\n");
+  print_challenge_message (z, w);
 
   /* Clean up */
   free (p_tmp4);

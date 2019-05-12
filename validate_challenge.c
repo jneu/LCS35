@@ -1,6 +1,5 @@
 #include "lcs35.h"
-
-#include <gmp.h>
+#include "print_challenge_message.h"
 
 static void
 validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
@@ -108,37 +107,6 @@ run_challenge (uint64_t t, mpz_t * p, mpz_t * q, mpz_t * n, mpz_t * w)
   mpz_clears (two, p_minus_1, q_minus_1, phi, tmp, NULL);
 }
 
-void
-print_message (mpz_t * z, mpz_t * w)
-{
-  mpz_t message;
-  size_t offset;
-  const uint8_t *raw_bytes;
-
-  mpz_init (message);
-
-  mpz_xor (message, *z, *w);
-
-  printf ("message:\n");
-  mpz_out_str (stdout, 10, message);
-  printf ("\n");
-
-  offset = mpz_size (message) * sizeof (mp_limb_t);
-  raw_bytes = (const uint8_t *) mpz_limbs_read (message);
-
-  while ((offset > 0) && (0 == raw_bytes[offset - 1]))
-    {
-      offset--;
-    }
-  while (offset > 0)
-    {
-      putchar ((int) raw_bytes[--offset]);
-    }
-  printf ("\n");
-
-  mpz_clear (message);
-}
-
 int
 main (void)
 {
@@ -162,7 +130,7 @@ main (void)
 
   /* Now do the hard work of running the challenge */
   run_challenge (t, &p, &q, &n, &w);
-  print_message (&z, &w);
+  print_challenge_message (z, w);
 
   /* Clean up */
   mpz_clears (n, z, p, q, w, NULL);

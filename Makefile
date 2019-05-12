@@ -14,14 +14,16 @@ TARGETS := lcs35 lcs35m validate_challenge
 L_OBJECTS := lcs35.o
 LM_OBJECTS := lcs35m.o
 VC_OBJECTS := validate_challenge.o
+COMMON_OBJECTS := print_challenge_message.o
 
 L_SOURCES := $(patsubst %.o,%.c,$(L_OBJECTS))
 LM_SOURCES := $(patsubst %.o,%.c,$(LM_OBJECTS))
 VC_SOURCES := $(patsubst %.o,%.c,$(VC_OBJECTS))
-HEADERS := lcs35.h challenge.h
-SOURCES := $(L_SOURCES) $(LM_SOURCES) $(VC_SOURCES) $(HEADERS)
+COMMON_SOURCES := $(patsubst %.o,%.c,$(COMMON_OBJECTS))
+HEADERS := lcs35.h challenge.h print_challenge_message.h
+SOURCES := $(L_SOURCES) $(LM_SOURCES) $(VC_SOURCES) $(COMMON_SOURCES) $(HEADERS)
 
-OBJECTS := $(L_OBJECTS) $(LM_OBJECTS) $(VC_OBJECTS)
+OBJECTS := $(L_OBJECTS) $(LM_OBJECTS) $(VC_OBJECTS) $(COMMON_OBJECTS)
 DEPS := $(patsubst %.o,%.d,$(OBJECTS))
 
 .PHONY: all
@@ -30,11 +32,11 @@ all: $(TARGETS)
 $(OBJECTS): %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-lcs35: $(L_OBJECTS)
+lcs35: $(L_OBJECTS) $(COMMON_OBJECTS)
 	$(LD) $(LDFLAGS) $^ -o $@
-lcs35m: $(LM_OBJECTS)
+lcs35m: $(LM_OBJECTS) $(COMMON_OBJECTS)
 	$(LD) $(LDFLAGS) $^ -o $@
-validate_challenge: $(VC_OBJECTS)
+validate_challenge: $(VC_OBJECTS) $(COMMON_OBJECTS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 .PHONY: clean

@@ -1,6 +1,5 @@
 #include "lcs35.h"
-
-#include <gmp.h>
+#include "print_challenge_message.h"
 
 int
 main (void)
@@ -27,11 +26,7 @@ main (void)
     }
 
   /* Create and show the message */
-  mpz_xor (w, w, z);
-
-  printf ("message:\n");
-  mpz_out_str (stdout, 10, w);
-  printf ("\n");
+  print_challenge_message (z, w);
 
   /* Clean up */
   mpz_clears (n, z, w, w2, NULL);
