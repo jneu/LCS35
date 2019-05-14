@@ -33,11 +33,11 @@ $(OBJECTS): %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 lcs35: $(L_OBJECTS) $(COMMON_OBJECTS)
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $^ $(LDFLAGS) -o $@
 lcs35m: $(LM_OBJECTS) $(COMMON_OBJECTS)
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $^ $(LDFLAGS) -o $@
 validate_challenge: $(VC_OBJECTS) $(COMMON_OBJECTS)
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $^ $(LDFLAGS) -o $@
 
 .PHONY: clean
 clean:
