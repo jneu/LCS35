@@ -4,11 +4,11 @@
 void
 print_challenge_message (const mpz_t z, const mpz_t w)
 {
-	mpz_t message;
+  mpz_t message;
   size_t offset;
   const uint8_t *raw_bytes;
 
-	mpz_init (message);
+  mpz_init (message);
 
   mpz_xor (message, z, w);
 
@@ -29,5 +29,5 @@ print_challenge_message (const mpz_t z, const mpz_t w)
     }
   printf ("\n");
 
-	mpz_clear (message);
+  mpz_clear (message);
 }
