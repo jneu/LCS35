@@ -5,11 +5,24 @@ LD := gcc
 
 CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE -g
 CFLAGS += -O2 -flto
-LDFLAGS := -g
-LDFLAGS += -lgmp
+LDFLAGS := -lgmp -g
 LDFLAGS += -O2 -flto
 
-TARGETS := lcs35 lcs35m validate_challenge
+TARGETS := lcs35 lcs35m
+
+ifeq ($(RUN_EXAMPLE),1)
+CFLAGS += -D_RUN_EXAMPLE
+TARGETS += validate_challenge
+else ifeq ($(RUN_FAKE),1)
+CFLAGS += -D_RUN_FAKE
+TARGETS += validate_challenge
+else ifeq ($(RUN_PARTIAL),1)
+CFLAGS += -D_RUN_PARTIAL
+else ifeq ($(RUN_FULL),1)
+CFLAGS += -D_RUN_FULL
+else
+TARGETS += validate_challenge
+endif
 
 L_OBJECTS := lcs35.o
 LM_OBJECTS := lcs35m.o
