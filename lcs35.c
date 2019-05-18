@@ -5,11 +5,11 @@ int
 main (void)
 {
   int rv;
-  mpz_t n, z, w, w2;
+  mpz_t n, z, w, w2, message;
   uint64_t t = T;
 
   /* Initializations */
-  mpz_inits (n, z, w, w2, NULL);
+  mpz_inits (n, z, w, w2, message, NULL);
 
   rv = mpz_set_str (n, N, 10);
   CHECK_RV (rv, "failed to set n");
@@ -26,10 +26,11 @@ main (void)
     }
 
   /* Create and show the message */
-  print_challenge_message (z, w);
+  mpz_xor (message, z, w);
+  print_challenge_message (message);
 
   /* Clean up */
-  mpz_clears (n, z, w, w2, NULL);
+  mpz_clears (n, z, w, w2, message, NULL);
 
   return EXIT_SUCCESS;
 }

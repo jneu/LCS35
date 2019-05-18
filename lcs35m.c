@@ -22,7 +22,7 @@ main (void)
    */
 
   int rv;
-  mpz_t n, z, w;
+  mpz_t n, z, w, message;
   mpz_t r, r_inv, n_prime;
   mp_limb_t *p_tmp2, *p_tmp3, *p_tmp4;
   const mp_limb_t *p_tmp1, *p_n, *p_n_prime;
@@ -34,7 +34,7 @@ main (void)
   assert (0 == (R_NUM_BYTES % sizeof (mp_limb_t)));
   assert (R_NUM_LIMBS > 0);
 
-  mpz_inits (n, z, w, NULL);
+  mpz_inits (n, z, w, message, NULL);
   mpz_inits (r, r_inv, n_prime, NULL);
 
   memset (mpz_limbs_modify (n, R_NUM_LIMBS), 0, R_NUM_BYTES);
@@ -98,14 +98,15 @@ main (void)
   mpz_mod (w, w, n);
 
   /* Create and show the message */
-  print_challenge_message (z, w);
+  mpz_xor (message, z, w);
+  print_challenge_message (message);
 
   /* Clean up */
   free (p_tmp4);
   free (p_tmp3);
   free (p_tmp2);
   mpz_clears (r, r_inv, n_prime, NULL);
-  mpz_clears (n, z, w, NULL);
+  mpz_clears (n, z, w, message, NULL);
 
   return EXIT_SUCCESS;
 }

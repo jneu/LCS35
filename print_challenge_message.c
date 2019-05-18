@@ -2,15 +2,10 @@
 #include "print_challenge_message.h"
 
 void
-print_challenge_message (const mpz_t z, const mpz_t w)
+print_challenge_message (mpz_t message)
 {
-  mpz_t message;
   size_t offset;
   const uint8_t *raw_bytes;
-
-  mpz_init (message);
-
-  mpz_xor (message, z, w);
 
   printf ("message:\n");
   mpz_out_str (stdout, 10, message);
@@ -28,6 +23,4 @@ print_challenge_message (const mpz_t z, const mpz_t w)
       putchar ((int) raw_bytes[--offset]);
     }
   printf ("\n");
-
-  mpz_clear (message);
 }

@@ -111,11 +111,11 @@ int
 main (void)
 {
   int rv;
-  mpz_t n, z, p, q, w;
+  mpz_t n, z, p, q, w, message;
   uint64_t t = T;
 
   /* Initialize the challenge values */
-  mpz_inits (n, z, p, q, w, NULL);
+  mpz_inits (n, z, p, q, w, message, NULL);
 
   rv = mpz_set_str (n, N, 10);
   CHECK_RV (rv, "failed to set n");
@@ -130,10 +130,11 @@ main (void)
 
   /* Now do the hard work of running the challenge */
   run_challenge (t, &p, &q, &n, &w);
-  print_challenge_message (z, w);
+  mpz_xor (message, z, w);
+  print_challenge_message (message);
 
   /* Clean up */
-  mpz_clears (n, z, p, q, w, NULL);
+  mpz_clears (n, z, p, q, w, message, NULL);
 
   return EXIT_SUCCESS;
 }
