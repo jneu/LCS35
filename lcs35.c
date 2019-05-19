@@ -6,7 +6,7 @@ main (void)
 {
   bool rv;
   mpz_t n, z, w, w2, message;
-  uint64_t t = T;
+  uint64_t t;
 
   /* Initializations */
   mpz_inits (n, z, w, w2, message, NULL);
@@ -16,6 +16,7 @@ main (void)
   rv = (0 == mpz_set_str (z, Z, 10));
   ASSERT_FATAL (rv, "failed to set z");
 
+  t = T;
   mpz_set_ui (w, 2);
 
   /* Get going */

@@ -2,7 +2,7 @@
 #include "print_challenge_message.h"
 
 /*
- * Pick the number of bits to use in the calculations
+ * The number of bits to use in the calculations
  */
 
 #define R_NUM_BITS 2048
@@ -24,7 +24,7 @@ main (void)
   mp_limb_t *p_tmp2, *p_tmp3, *p_tmp4;
   const mp_limb_t *p_tmp1, *p_n, *p_n_prime;
   mpz_t final;
-  uint64_t t = T;
+  uint64_t t;
 
   /* Initializations */
   assert (0 == (R_NUM_BITS % 8));
@@ -41,6 +41,7 @@ main (void)
   rv = (0 == mpz_set_str (z, Z, 10));
   ASSERT_FATAL (rv, "failed to set z");
 
+  t = T;
   mpz_set_ui (w, 2);
 
   mpz_ui_pow_ui (r, 2, R_NUM_BITS);
