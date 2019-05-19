@@ -1,15 +1,16 @@
 #include "lcs35.h"
+#include "parse_challenge_message.h"
 #include "print_challenge_message.h"
 
 static void
-validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
+validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
 {
   int rv;
   mpz_t gcd, pq;
 
   mpz_inits (gcd, pq, NULL);
 
-  if (0 != mpz_odd_p (*p))
+  if (0 != mpz_odd_p (p))
     {
       printf ("p is odd\n");
     }
@@ -19,7 +20,7 @@ validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
       exit (EXIT_FAILURE);
     }
 
-  if (0 != mpz_odd_p (*q))
+  if (0 != mpz_odd_p (q))
     {
       printf ("q is odd\n");
     }
@@ -29,7 +30,7 @@ validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
       exit (EXIT_FAILURE);
     }
 
-  mpz_gcd (gcd, *p, *q);
+  mpz_gcd (gcd, p, q);
   if (0 == mpz_cmp_ui (gcd, 1))
     {
       printf ("p and q are relatively prime\n");
@@ -42,7 +43,7 @@ validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
       exit (EXIT_FAILURE);
     }
 
-  rv = mpz_probab_prime_p (*p, NUM_PRIME_REPS);
+  rv = mpz_probab_prime_p (p, NUM_PRIME_REPS);
   if (2 == rv)
     {
       printf ("p is definitely prime\n");
@@ -57,7 +58,7 @@ validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
       exit (EXIT_FAILURE);
     }
 
-  rv = mpz_probab_prime_p (*q, NUM_PRIME_REPS);
+  rv = mpz_probab_prime_p (q, NUM_PRIME_REPS);
   if (2 == rv)
     {
       printf ("q is definitely prime\n");
@@ -72,8 +73,8 @@ validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
       exit (EXIT_FAILURE);
     }
 
-  mpz_mul (pq, *p, *q);
-  if (0 == mpz_cmp (pq, *n))
+  mpz_mul (pq, p, q);
+  if (0 == mpz_cmp (pq, n))
     {
       printf ("p * q is equal to n\n");
     }
@@ -87,7 +88,7 @@ validate_challenge (mpz_t * n, mpz_t * p, mpz_t * q)
 }
 
 static void
-run_challenge (uint64_t t, mpz_t * p, mpz_t * q, mpz_t * n, mpz_t * w)
+run_challenge (mpz_t w, uint64_t t, const mpz_t p, const mpz_t q, const mpz_t n)
 {
   mpz_t p_minus_1, q_minus_1, phi;
   mpz_t two, tmp;
@@ -95,16 +96,51 @@ run_challenge (uint64_t t, mpz_t * p, mpz_t * q, mpz_t * n, mpz_t * w)
   mpz_inits (p_minus_1, q_minus_1, phi, two, tmp, NULL);
 
   /* Compute the Euler totient of p * q, assuming both are prime */
-  mpz_sub_ui (p_minus_1, *p, 1);
-  mpz_sub_ui (q_minus_1, *q, 1);
+  mpz_sub_ui (p_minus_1, p, 1);
+  mpz_sub_ui (q_minus_1, q, 1);
   mpz_mul (phi, p_minus_1, q_minus_1);
 
   /* Use Euler's Theorem to compute the challenge value */
   mpz_set_ui (two, 2);
   mpz_powm_ui (tmp, two, t, phi);
-  mpz_powm (*w, two, tmp, *n);
+  mpz_powm (w, two, tmp, n);
 
   mpz_clears (two, p_minus_1, q_minus_1, phi, tmp, NULL);
+}
+
+static void
+recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q)
+{
+  mpz_t seed, big_2, w;
+
+  mpz_inits (seed, big_2, w, NULL);
+
+  if (!parse_challenge_message (seed, message))
+    {
+      printf ("failed to parse challenge message\n");
+      exit (EXIT_FAILURE);
+    }
+
+  mpz_set_ui (w, 5);
+  mpz_ui_pow_ui (big_2, 2, 1024);
+  mpz_powm (w, w, seed, big_2);
+  mpz_nextprime (w, w);
+
+  if (0 == mpz_cmp (w, p))
+    {
+      printf ("message seed gives p\n");
+    }
+  else if (0 == mpz_cmp (w, q))
+    {
+      printf ("message seed gives q\n");
+    }
+  else
+    {
+      printf ("failed to find p or q from message seed\n");
+      exit (EXIT_FAILURE);
+    }
+
+  mpz_clears (seed, big_2, w, NULL);
 }
 
 int
@@ -126,12 +162,16 @@ main (void)
   rv = mpz_set_str (q, Q, 10);
   CHECK_RV (rv, "failed to set q");
 
-  validate_challenge (&n, &p, &q);
+  validate_challenge (n, p, q);
 
   /* Now do the hard work of running the challenge */
-  run_challenge (t, &p, &q, &n, &w);
+  run_challenge (w, t, p, q, n);
+
   mpz_xor (message, z, w);
   print_challenge_message (message);
+
+  /* Try to recover p or q */
+  recover_p_from_seed (message, p, q);
 
   /* Clean up */
   mpz_clears (n, z, p, q, w, message, NULL);

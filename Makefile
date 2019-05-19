@@ -22,14 +22,14 @@ endif
 
 L_OBJECTS := lcs35.o
 LM_OBJECTS := lcs35m.o
-VC_OBJECTS := validate_challenge.o
+VC_OBJECTS := validate_challenge.o parse_challenge_message.o
 COMMON_OBJECTS := print_challenge_message.o
 
 L_SOURCES := $(patsubst %.o,%.c,$(L_OBJECTS))
 LM_SOURCES := $(patsubst %.o,%.c,$(LM_OBJECTS))
 VC_SOURCES := $(patsubst %.o,%.c,$(VC_OBJECTS))
 COMMON_SOURCES := $(patsubst %.o,%.c,$(COMMON_OBJECTS))
-HEADERS := lcs35.h challenge.h print_challenge_message.h
+HEADERS := lcs35.h challenge.h print_challenge_message.h parse_challenge_message.h
 SOURCES := $(L_SOURCES) $(LM_SOURCES) $(VC_SOURCES) $(COMMON_SOURCES) $(HEADERS)
 
 OBJECTS := $(L_OBJECTS) $(LM_OBJECTS) $(VC_OBJECTS) $(COMMON_OBJECTS)

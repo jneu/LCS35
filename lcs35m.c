@@ -50,7 +50,7 @@ main (void)
   assert (mpz_cmp (n, r) < 0);
 
   rv = mpz_invert (r_inv, r, n);
-  CHECK_RV0 (rv, "r in not invertible mod n");
+  CHECK_RV_0 (rv, "r in not invertible mod n");
 
   mpz_invert (n_prime, n, r);
   mpz_mul_si (n_prime, n_prime, -1);
