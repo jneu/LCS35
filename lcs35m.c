@@ -1,9 +1,6 @@
 #include "lcs35.h"
 #include "print_challenge_message.h"
 
-#include <assert.h>
-#include <string.h>
-
 /*
  * Pick the number of bits to use in the calculations
  */
@@ -21,7 +18,7 @@ main (void)
    * n * n_prime = -1 mod r
    */
 
-  int rv;
+  bool rv;
   mpz_t n, z, w, message;
   mpz_t r, r_inv, n_prime;
   mp_limb_t *p_tmp2, *p_tmp3, *p_tmp4;
@@ -39,18 +36,22 @@ main (void)
 
   memset (mpz_limbs_modify (n, R_NUM_LIMBS), 0, R_NUM_BYTES);
 
-  rv = mpz_set_str (n, N, 10);
-  CHECK_RV (rv, "failed to set n");
-  rv = mpz_set_str (z, Z, 10);
-  CHECK_RV (rv, "failed to set z");
+  rv = (0 == mpz_set_str (n, N, 10));
+  ASSERT_FATAL (rv, "failed to set n");
+  rv = (0 == mpz_set_str (z, Z, 10));
+  ASSERT_FATAL (rv, "failed to set z");
 
   mpz_set_ui (w, 2);
 
   mpz_ui_pow_ui (r, 2, R_NUM_BITS);
   assert (mpz_cmp (n, r) < 0);
 
-  rv = mpz_invert (r_inv, r, n);
-  CHECK_RV_0 (rv, "r in not invertible mod n");
+  rv = (0 != mpz_invert (r_inv, r, n));
+  if (!rv)
+    {
+      printf ("r is not invertiable mod n\n");
+      exit (EXIT_FAILURE);
+    }
 
   mpz_invert (n_prime, n, r);
   mpz_mul_si (n_prime, n_prime, -1);
@@ -59,12 +60,12 @@ main (void)
   mpz_mul (w, w, r);
   mpz_mod (w, w, n);
 
-  rv = posix_memalign ((void **) &p_tmp2, 64, 2 * R_NUM_BYTES);
-  CHECK_RV (rv, "failed to allocate p_tmp2");
-  rv = posix_memalign ((void **) &p_tmp3, 64, 2 * R_NUM_BYTES);
-  CHECK_RV (rv, "failed to allocate p_tmp3");
-  rv = posix_memalign ((void **) &p_tmp4, 64, 2 * R_NUM_BYTES);
-  CHECK_RV (rv, "failed to allocate p_tmp4");
+  rv = (0 == posix_memalign ((void **) &p_tmp2, 64, 2 * R_NUM_BYTES));
+  ASSERT_FATAL (rv, "failed to allocate p_tmp2");
+  rv = (0 == posix_memalign ((void **) &p_tmp3, 64, 2 * R_NUM_BYTES));
+  ASSERT_FATAL (rv, "failed to allocate p_tmp3");
+  rv = (0 == posix_memalign ((void **) &p_tmp4, 64, 2 * R_NUM_BYTES));
+  ASSERT_FATAL (rv, "failed to allocate p_tmp4");
 
   memset (p_tmp2, 0, 2 * R_NUM_BYTES);
   memset (p_tmp3, 0, 2 * R_NUM_BYTES);

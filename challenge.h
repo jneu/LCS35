@@ -1,7 +1,11 @@
 #ifndef CHALLENGE_H
 #define CHALLENGE_H
 
-#include <stdint.h>
+/*
+ * How sure should we be that a number is prime?
+ */
+
+#define NUM_PRIME_REPS 40
 
 /*
  * Define the challenge parameters
@@ -119,7 +123,5 @@
   "93333731"
 
 #endif
-
-#define NUM_PRIME_REPS 40
 
 #endif

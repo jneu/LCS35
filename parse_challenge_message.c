@@ -27,7 +27,7 @@ parse_challenge_message (mpz_t seed, const mpz_t message)
     return false;
 
   ascii_str = malloc (space);
-  CHECK_RV_NULL (ascii_str, "failed to allocate ascii_str");
+  ASSERT_FATAL (NULL != ascii_str, "failed to allocate ascii_str");
 
   for (src = space - 1, dest = 0; src > 0; src--, dest++)
     {

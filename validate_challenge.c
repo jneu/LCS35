@@ -146,21 +146,21 @@ recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q)
 int
 main (void)
 {
-  int rv;
+  bool rv;
   mpz_t n, z, p, q, w, message;
   uint64_t t = T;
 
   /* Initialize the challenge values */
   mpz_inits (n, z, p, q, w, message, NULL);
 
-  rv = mpz_set_str (n, N, 10);
-  CHECK_RV (rv, "failed to set n");
-  rv = mpz_set_str (z, Z, 10);
-  CHECK_RV (rv, "failed to set z");
-  rv = mpz_set_str (p, P, 10);
-  CHECK_RV (rv, "failed to set p");
-  rv = mpz_set_str (q, Q, 10);
-  CHECK_RV (rv, "failed to set q");
+  rv = (0 == mpz_set_str (n, N, 10));
+  ASSERT_FATAL (rv, "failed to set n");
+  rv = (0 == mpz_set_str (z, Z, 10));
+  ASSERT_FATAL (rv, "failed to set z");
+  rv = (0 == mpz_set_str (p, P, 10));
+  ASSERT_FATAL (rv, "failed to set p");
+  rv = (0 == mpz_set_str (q, Q, 10));
+  ASSERT_FATAL (rv, "failed to set q");
 
   validate_challenge (n, p, q);
 
