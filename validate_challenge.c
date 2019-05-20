@@ -12,41 +12,41 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
 
   if (0 != mpz_odd_p (p))
     {
-      printf ("p is odd\n");
+      puts ("p is odd");
     }
   else
     {
-      printf ("p is even\n");
+      puts ("p is even");
       exit (EXIT_FAILURE);
     }
 
   if (0 != mpz_odd_p (q))
     {
-      printf ("q is odd\n");
+      puts ("q is odd");
     }
   else
     {
-      printf ("q is even\n");
+      puts ("q is even");
       exit (EXIT_FAILURE);
     }
 
   mpz_gcd (gcd, p, q);
   if (0 == mpz_cmp_ui (gcd, 1))
     {
-      printf ("p and q are relatively prime\n");
+      puts ("p and q are relatively prime");
     }
   else
     {
-      printf ("p and q are not relatively prime; their gcd is:\n");
+      puts ("p and q are not relatively prime; their gcd is:");
       mpz_out_str (stdout, 10, gcd);
-      printf ("\n");
+      putchar ('\n');
       exit (EXIT_FAILURE);
     }
 
   rv = mpz_probab_prime_p (p, NUM_PRIME_REPS);
   if (2 == rv)
     {
-      printf ("p is definitely prime\n");
+      puts ("p is definitely prime");
     }
   else if (1 == rv)
     {
@@ -54,14 +54,14 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
     }
   else
     {
-      printf ("p is definitely not prime\n");
+      puts ("p is definitely not prime");
       exit (EXIT_FAILURE);
     }
 
   rv = mpz_probab_prime_p (q, NUM_PRIME_REPS);
   if (2 == rv)
     {
-      printf ("q is definitely prime\n");
+      puts ("q is definitely prime");
     }
   else if (1 == rv)
     {
@@ -69,18 +69,18 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
     }
   else
     {
-      printf ("q is definitely not prime\n");
+      puts ("q is definitely not prime");
       exit (EXIT_FAILURE);
     }
 
   mpz_mul (pq, p, q);
   if (0 == mpz_cmp (pq, n))
     {
-      printf ("p * q is equal to n\n");
+      puts ("p * q is equal to n");
     }
   else
     {
-      printf ("p * q is not equal to n\n");
+      puts ("p * q is not equal to n");
       exit (EXIT_FAILURE);
     }
 
@@ -117,7 +117,7 @@ recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q)
 
   if (!parse_challenge_message (seed, message))
     {
-      printf ("failed to parse challenge message\n");
+      puts ("failed to parse challenge message");
       exit (EXIT_FAILURE);
     }
 
@@ -128,15 +128,15 @@ recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q)
 
   if (0 == mpz_cmp (w, p))
     {
-      printf ("message seed gives p\n");
+      puts ("message seed gives p");
     }
   else if (0 == mpz_cmp (w, q))
     {
-      printf ("message seed gives q\n");
+      puts ("message seed gives q");
     }
   else
     {
-      printf ("failed to find p or q from message seed\n");
+      puts ("failed to find p or q from message seed");
       exit (EXIT_FAILURE);
     }
 

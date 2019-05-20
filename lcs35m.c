@@ -50,7 +50,7 @@ main (void)
   rv = (0 != mpz_invert (r_inv, r, n));
   if (!rv)
     {
-      printf ("r is not invertiable mod n\n");
+      puts ("r is not invertiable mod n");
       exit (EXIT_FAILURE);
     }
 

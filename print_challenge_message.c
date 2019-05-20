@@ -7,9 +7,9 @@ print_challenge_message (mpz_t message)
   size_t offset;
   const uint8_t *raw_bytes;
 
-  printf ("message:\n");
+  puts ("message:");
   mpz_out_str (stdout, 10, message);
-  printf ("\n");
+  putchar ('\n');
 
   offset = mpz_size (message) * sizeof (mp_limb_t);
   raw_bytes = (const uint8_t *) mpz_limbs_read (message);
@@ -22,5 +22,5 @@ print_challenge_message (mpz_t message)
     {
       putchar ((int) raw_bytes[--offset]);
     }
-  printf ("\n");
+  putchar ('\n');
 }

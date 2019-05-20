@@ -19,7 +19,7 @@
 
 #define N "253"
 #define Z "19"
-#define T ((uint64_t) 10)
+#define T ((uint64_t) 10UL)
 
 #define P "11"
 #define Q "23"
@@ -52,7 +52,7 @@
   "692369894869107426803861518411259964070442140608157227154157" \
   "884236247348"
 
-#define T ((uint64_t) 31536000)
+#define T ((uint64_t) 31536000UL)
 
 #define P \
   "760061255038074767615950132587144874505518927112391485295391" \
@@ -100,10 +100,10 @@
 
 #if _RUN_PARTIAL
   /* Just do a million */
-#define T ((uint64_t) 1000000)
+#define T ((uint64_t) 1000000UL)
 #else
   /* Do the full run */
-#define T ((uint64_t) 79685186856218)
+#define T ((uint64_t) 79685186856218UL)
 #endif
 
 #define P \
