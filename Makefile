@@ -3,10 +3,11 @@ SHELL := bash
 CC := gcc
 LD := gcc
 
-CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE -g
-CFLAGS += -O2 -flto
-LDFLAGS := -lgmp -g
-LDFLAGS += -O2 -flto
+COMMON_FLAGS := -O2 -flto -g
+CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE
+CFLAGS += $(COMMON_FLAGS)
+LDFLAGS := -lgmp
+LDFLAGS += $(COMMON_FLAGS)
 
 TARGETS := lcs35 lcs35m validate_challenge
 
@@ -14,8 +15,6 @@ ifeq ($(RUN_EXAMPLE),1)
 CFLAGS += -D_RUN_EXAMPLE
 else ifeq ($(RUN_FAKE),1)
 CFLAGS += -D_RUN_FAKE
-else ifeq ($(RUN_PARTIAL),1)
-CFLAGS += -D_RUN_PARTIAL
 else ifeq ($(RUN_FULL),1)
 CFLAGS += -D_RUN_FULL
 endif

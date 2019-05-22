@@ -9,6 +9,11 @@
 #define R_NUM_BYTES (R_NUM_BITS / 8)
 #define R_NUM_LIMBS (R_NUM_BYTES / sizeof (mp_limb_t))
 
+#if (0 != (R_NUM_BITS % 8))
+#error something is wrong with the bits
+#endif
+
+
 int
 main (void)
 {
@@ -27,7 +32,6 @@ main (void)
   uint64_t t;
 
   /* Initializations */
-  assert (0 == (R_NUM_BITS % 8));
   assert (0 == (R_NUM_BYTES % sizeof (mp_limb_t)));
   assert (R_NUM_LIMBS > 0);
 
@@ -45,7 +49,11 @@ main (void)
   mpz_set_ui (w, 2);
 
   mpz_ui_pow_ui (r, 2, R_NUM_BITS);
-  assert (mpz_cmp (n, r) < 0);
+  if (mpz_cmp (n, r) >= 0)
+    {
+      fputs ("not enough bits\n", stderr);
+      exit (EXIT_FAILURE);
+    }
 
   rv = (0 != mpz_invert (r_inv, r, n));
   if (!rv)

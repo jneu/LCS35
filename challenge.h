@@ -11,7 +11,7 @@
  * Define the challenge parameters
  */
 
-#if !(_RUN_FULL || _RUN_PARTIAL || _RUN_FAKE || _RUN_EXAMPLE)
+#if !(_RUN_FULL || _RUN_FAKE || _RUN_EXAMPLE)
 #define _RUN_EXAMPLE 1
 #endif
 
@@ -98,13 +98,7 @@
   "989361374561414204719371297211725179287931039547753581030226" \
   "7611143659071382"
 
-#if _RUN_PARTIAL
-  /* Just do a million */
-#define T ((uint64_t) 1000000UL)
-#else
-  /* Do the full run */
 #define T ((uint64_t) 79685186856218UL)
-#endif
 
 #define P \
   "154562048657421937084682913138460711844778329290535727168950" \

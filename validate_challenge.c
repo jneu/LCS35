@@ -150,6 +150,9 @@ main (void)
   mpz_t n, z, p, q, w, message;
   uint64_t t = T;
 
+  /* We need to check this somewhere... */
+  assert ((64 / 8) == sizeof (mp_limb_t));
+
   /* Initialize the challenge values */
   mpz_inits (n, z, p, q, w, message, NULL);
 

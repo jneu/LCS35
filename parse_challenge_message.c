@@ -4,6 +4,7 @@
 bool
 parse_challenge_message (mpz_t seed, const mpz_t message)
 {
+  bool rv;
   size_t offset, space, src, dest;
   const uint8_t *raw_bytes;
   char *ascii_str;
@@ -26,8 +27,8 @@ parse_challenge_message (mpz_t seed, const mpz_t message)
   if (('0' == raw_bytes[space - 1]) && (space > 2))
     return false;
 
-  ascii_str = malloc (space);
-  ASSERT_FATAL (NULL != ascii_str, "failed to allocate ascii_str");
+  rv = (NULL != (ascii_str = malloc (space)));
+  ASSERT_FATAL (rv, "failed to allocate ascii_str");
 
   for (src = space - 1, dest = 0; src > 0; src--, dest++)
     {
