@@ -131,9 +131,6 @@ error_check (uint64_t s, const mpz_t w)
 
   mpz_t check;
 
-  if (0 == s_error_check)
-    return;
-
   mpz_init (check);
 
   mpz_powm_ui (check, two, s, totient_c);
@@ -156,11 +153,11 @@ int
 main (int argc, char *argv[])
 {
   bool rv;
-  mpz_t n, z, cn, w, w2, message;
+  mpz_t n, z, w, w2, message;
   uint64_t s, t;
 
   /* Initializations */
-  mpz_inits (n, z, cn, w, w2, message, NULL);
+  mpz_inits (n, z, w, w2, message, NULL);
 
   mpz_set_ui (w, 2);
   s = 0;
@@ -172,22 +169,24 @@ main (int argc, char *argv[])
   rv = (0 == mpz_set_str (z, Z, 10));
   ASSERT_FATAL (rv, "failed to set z");
 
-  mpz_mul_ui (cn, n, C);
-  error_check (s, w);
-
   /* Get going */
   if (0 == s_error_check)
     {
       while (t-- > 0)
         {
-          s++;
-
           mpz_mul (w2, w, w);
           mpz_mod (w, w2, n);
         }
     }
   else
     {
+      mpz_t cn;
+
+      mpz_init (cn);
+
+      mpz_mul_ui (cn, n, C);
+      error_check (s, w);
+
       while (t-- > 0)
         {
           s++;
@@ -198,18 +197,19 @@ main (int argc, char *argv[])
           if (0 == (s % s_error_check))
             error_check (s, w);
         }
-    }
 
-  /* This mod is a nop unless error checking */
-  error_check (s, w);
-  mpz_mod (w, w, n);
+      error_check (s, w);
+      mpz_mod (w, w, n);
+
+      mpz_clear (cn);
+    }
 
   /* Create and show the message */
   mpz_xor (message, z, w);
   print_challenge_message (message);
 
   /* Clean up */
-  mpz_clears (n, z, cn, w, w2, message, NULL);
+  mpz_clears (n, z, w, w2, message, NULL);
 
   return EXIT_SUCCESS;
 }
