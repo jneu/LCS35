@@ -14,17 +14,21 @@
 static uint64_t s_error_check = 0;
 
 static void
-parse_options (int *argc, char ***argv)
+parse_options (int argc, char *argv[], uint64_t * s, mpz_t w)
 {
   static struct option options[2] = {
     {"error-check", required_argument, NULL, 'e'},
     {NULL, 0, NULL, 0}
   };
   int c;
+  bool rv;
+  mpz_t arg;
+
+  mpz_init (arg);
 
   while (true)
     {
-      c = getopt_long (*argc, *argv, "e:", options, NULL);
+      c = getopt_long (argc, argv, "e:", options, NULL);
       if (-1 == c)
         break;
 
@@ -32,31 +36,87 @@ parse_options (int *argc, char ***argv)
         {
         case 'e':
           {
-            bool rv;
-            mpz_t ec_arg;
-
-            rv = (0 == mpz_init_set_str (ec_arg, optarg, 10));
+            rv = (0 == mpz_set_str (arg, optarg, 10));
             if (!rv)
               {
-                fputs ("bad argument\n", stderr);
+                fputs ("bad --error-check argument\n", stderr);
                 exit (EXIT_FAILURE);
               }
 
-            if (mpz_cmp_ui (ec_arg, UINT64_MAX) > 0)
+            if (mpz_cmp_ui (arg, UINT64_MAX) > 0)
               {
-                fputs ("argument too large\n", stderr);
+                fputs ("argument --error-check too large\n", stderr);
                 exit (EXIT_FAILURE);
               }
 
-            s_error_check = mpz_get_ui (ec_arg);
+            if (mpz_cmp_ui (arg, 0) < 0)
+              {
+                fputs ("argument --error-check is negative\n", stderr);
+                exit (EXIT_FAILURE);
+              }
 
-            mpz_clear (ec_arg);
+            s_error_check = mpz_get_ui (arg);
           }
           break;
         default:
           exit (EXIT_FAILURE);
         }
     }
+
+  if (optind < argc)
+    {
+      if (optind != (argc - 2))
+        {
+          fputs ("invalid number of arguments\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+
+      if (0 == s_error_check)
+        {
+          fputs ("--error-check must be set if s and w are given\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+
+      /* Parse s */
+      rv = (0 == mpz_set_str (arg, argv[optind], 10));
+      if (!rv)
+        {
+          fputs ("bad s argument\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+
+      if (mpz_cmp_ui (arg, UINT64_MAX) > 0)
+        {
+          fputs ("argument s too large\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+
+      if (mpz_cmp_ui (arg, 0) < 0)
+        {
+          fputs ("argument s is negative\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+
+      *s = mpz_get_ui (arg);
+
+      /* Parse w */
+      rv = (0 == mpz_set_str (arg, argv[optind + 1], 10));
+      if (!rv)
+        {
+          fputs ("bad w argument\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+
+      if (mpz_cmp_ui (arg, 0) < 0)
+        {
+          fputs ("argument w is negative\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+
+      mpz_set (w, arg);
+    }
+
+  mpz_clear (arg);
 }
 
 static void
@@ -86,6 +146,10 @@ error_check (uint64_t s, const mpz_t w)
     }
 
   mpz_clear (check);
+
+  printf ("%" PRIu64 " ", s);
+  mpz_out_str (stdout, 10, w);
+  putchar ('\n');
 }
 
 int
@@ -95,10 +159,13 @@ main (int argc, char *argv[])
   mpz_t n, z, cn, w, w2, message;
   uint64_t s, t;
 
-  parse_options (&argc, &argv);
-
   /* Initializations */
   mpz_inits (n, z, cn, w, w2, message, NULL);
+
+  mpz_set_ui (w, 2);
+  s = 0;
+  parse_options (argc, argv, &s, w);
+  t = T - s;
 
   rv = (0 == mpz_set_str (n, N, 10));
   ASSERT_FATAL (rv, "failed to set n");
@@ -106,10 +173,6 @@ main (int argc, char *argv[])
   ASSERT_FATAL (rv, "failed to set z");
 
   mpz_mul_ui (cn, n, C);
-
-  s = 0;
-  t = T;
-  mpz_set_ui (w, 2);
   error_check (s, w);
 
   /* Get going */
