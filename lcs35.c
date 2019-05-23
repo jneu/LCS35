@@ -182,10 +182,10 @@ main (int argc, char *argv[])
     {
       mpz_t cn;
 
-      mpz_init (cn);
-
-      mpz_mul_ui (cn, n, C);
       error_check (s, w);
+
+      mpz_init (cn);
+      mpz_mul_ui (cn, n, C);
 
       while (t-- > 0)
         {
@@ -198,10 +198,10 @@ main (int argc, char *argv[])
             error_check (s, w);
         }
 
+      mpz_clear (cn);
+
       error_check (s, w);
       mpz_mod (w, w, n);
-
-      mpz_clear (cn);
     }
 
   /* Create and show the message */
