@@ -55,7 +55,9 @@ clean:
 
 .PHONY: indent
 indent:
-	for f in $(SOURCES); do \
+	for f in \
+		$(SOURCES) \
+	; do \
 		indent -gnu -nut -l120 $$f -o _indent.tmp; \
 		diff --brief $$f _indent.tmp >/dev/null 2>&1 || mv -f _indent.tmp $$f; \
 		rm -f _indent.tmp; \
