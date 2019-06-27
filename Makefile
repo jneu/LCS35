@@ -4,7 +4,7 @@ CC := gcc
 LD := gcc
 
 COMMON_FLAGS := -O2 -flto -g
-CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE
+CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE -ansi -pedantic
 CFLAGS += $(COMMON_FLAGS)
 LDFLAGS := -lgmp
 LDFLAGS += $(COMMON_FLAGS)
