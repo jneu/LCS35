@@ -3,43 +3,32 @@ SHELL := bash
 CC := gcc
 LD := gcc
 
-C_SRCDIR := src/main/c
+C_SRCDIR := src
 TARGETDIR := target
 
 COMMON_FLAGS := -O2 -flto -g
-CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE -ansi -pedantic
+CFLAGS := -Wall -Wextra -Werror -MMD -D_GNU_SOURCE -std=c99 -pedantic
 CFLAGS += $(COMMON_FLAGS)
 LDFLAGS := -lgmp
 LDFLAGS += $(COMMON_FLAGS)
 
-TARGETS := lcs35 lcs35m validate_challenge
-
-ifeq ($(RUN_EXAMPLE),1)
-CFLAGS += -D_RUN_EXAMPLE
-else ifeq ($(RUN_FAKE),1)
-CFLAGS += -D_RUN_FAKE
-else ifeq ($(RUN_FULL),1)
-CFLAGS += -D_RUN_FULL
-endif
+TARGETS := lcs35 validate_challenge
 
 L_OBJECTS := lcs35.o
-LM_OBJECTS := lcs35m.o
 VC_OBJECTS := validate_challenge.o parse_challenge_message.o
 COMMON_OBJECTS := print_challenge_message.o
 
 L_SOURCES := $(patsubst $(TARGETDIR)/%.o,$(C_SRCDIR)/%.c,$(L_OBJECTS))
-LM_SOURCES := $(patsubst $(TARGETDIR)/%.o,$(C_SRCDIR)/%.c,$(LM_OBJECTS))
 VC_SOURCES := $(patsubst $(TARGETDIR)/%.o,$(C_SRCDIR)/%.c,$(VC_OBJECTS))
 COMMON_SOURCES := $(patsubst $(TARGETDIR)/%.o,$(C_SRCDIR)/%.c,$(COMMON_OBJECTS))
 HEADERS := lcs35.h challenge.h print_challenge_message.h parse_challenge_message.h
-SOURCES := $(addprefix $(C_SRCDIR)/,$(L_SOURCES) $(LM_SOURCES) $(VC_SOURCES) $(COMMON_SOURCES) $(HEADERS))
+SOURCES := $(addprefix $(C_SRCDIR)/,$(L_SOURCES) $(VC_SOURCES) $(COMMON_SOURCES) $(HEADERS))
 
 L_OBJECTS := $(addprefix $(TARGETDIR)/,$(L_OBJECTS))
-LM_OBJECTS := $(addprefix $(TARGETDIR)/,$(LM_OBJECTS))
 VC_OBJECTS := $(addprefix $(TARGETDIR)/,$(VC_OBJECTS))
 COMMON_OBJECTS := $(addprefix $(TARGETDIR)/,$(COMMON_OBJECTS))
 
-OBJECTS := $(L_OBJECTS) $(LM_OBJECTS) $(VC_OBJECTS) $(COMMON_OBJECTS)
+OBJECTS := $(L_OBJECTS) $(VC_OBJECTS) $(COMMON_OBJECTS)
 DEPS := $(patsubst %.o,%.d,$(OBJECTS))
 
 .PHONY: all
@@ -53,8 +42,6 @@ $(OBJECTS): $(TARGETDIR)/%.o: $(C_SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 lcs35: $(L_OBJECTS) $(COMMON_OBJECTS)
-	$(LD) $^ $(LDFLAGS) -o $@
-lcs35m: $(LM_OBJECTS) $(COMMON_OBJECTS)
 	$(LD) $^ $(LDFLAGS) -o $@
 validate_challenge: $(VC_OBJECTS) $(COMMON_OBJECTS)
 	$(LD) $^ $(LDFLAGS) -o $@
