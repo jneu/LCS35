@@ -18,9 +18,11 @@ print_challenge_message (mpz_t message)
     {
       offset--;
     }
-  while (offset > 0)
+
+  while (offset-- > 0)
     {
-      putchar ((int) raw_bytes[--offset]);
+      putchar ((int) raw_bytes[offset]);
     }
+
   putchar ('\n');
 }

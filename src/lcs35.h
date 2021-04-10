@@ -12,8 +12,6 @@
 
 #include <gmp.h>
 
-#include "challenge.h"
-
 /*
  * Basic error reporting
  */

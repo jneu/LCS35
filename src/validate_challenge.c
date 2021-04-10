@@ -1,4 +1,5 @@
 #include "lcs35.h"
+#include "challenge.h"
 #include "parse_challenge_message.h"
 #include "print_challenge_message.h"
 
@@ -24,42 +25,25 @@ parse_options (int argc, char *argv[], const challenge ** puzzle)
     {
       int c;
 
-      c = getopt_long (argc, argv, "e:p:", options, NULL);
+      c = getopt_long (argc, argv, "p:", options, NULL);
       if (-1 == c)
         break;
 
       switch (c)
         {
         case 'p':
-          if (0 == strcmp (optarg, "LCS35-example"))
+          for (*puzzle = &challenges[0]; NULL != (*puzzle)->name; (*puzzle)++)
             {
-              *puzzle = &LCS35_example;
+              if (0 == strcmp (optarg, (*puzzle)->name))
+                break;
             }
-          else if (0 == strcmp (optarg, "LCS35-easy"))
-            {
-              *puzzle = &LCS35_easy;
-            }
-          else if (0 == strcmp (optarg, "LCS35"))
-            {
-              *puzzle = &LCS35;
-            }
-          else if (0 == strcmp (optarg, "CSAIL2019-example"))
-            {
-              *puzzle = &CSAIL2019_example;
-            }
-          else if (0 == strcmp (optarg, "CSAIL2019-easy"))
-            {
-              *puzzle = &CSAIL2019_easy;
-            }
-          else if (0 == strcmp (optarg, "CSAIL2019"))
-            {
-              *puzzle = &CSAIL2019;
-            }
-          else
+
+          if (NULL == (*puzzle)->name)
             {
               fputs ("argument --puzzle is unknown\n", stderr);
               exit (EXIT_FAILURE);
             }
+
           break;
         default:
           fputs ("unknown option\n", stderr);
@@ -214,12 +198,14 @@ main (int argc, char *argv[])
 {
   bool rv;
   mpz_t n, z, p, q, w, message;
-  const challenge *puzzle = &LCS35_easy;
+  const challenge *puzzle = &challenges[0];
 
   /* We need to check this somewhere... */
   assert ((64 / 8) == sizeof (mp_limb_t));
 
   parse_options (argc, argv, &puzzle);
+
+  printf ("puzzle: %s\n", puzzle->name);
 
   /* Initialize the challenge values */
   mpz_inits (n, z, p, q, w, message, NULL);

@@ -7,6 +7,8 @@
 
 typedef struct def_challenge
 {
+  const char *name;
+
   uint64_t T;
 
   int prime_length;
@@ -17,11 +19,6 @@ typedef struct def_challenge
   const char *Z;
 } challenge;
 
-extern challenge LCS35_example;
-extern challenge LCS35_easy;
-extern challenge LCS35;
-extern challenge CSAIL2019_example;
-extern challenge CSAIL2019_easy;
-extern challenge CSAIL2019;
+extern challenge challenges[7];
 
 #endif

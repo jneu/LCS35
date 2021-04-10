@@ -1,4 +1,5 @@
 #include "lcs35.h"
+#include "challenge.h"
 #include "print_challenge_message.h"
 
 /*
@@ -37,59 +38,41 @@ parse_options (int argc, char *argv[], uint64_t * s, mpz_t w, const challenge **
       switch (c)
         {
         case 'e':
-          {
-            rv = (0 == mpz_set_str (arg, optarg, 10));
-            if (!rv)
-              {
-                fputs ("bad --error-check argument\n", stderr);
-                exit (EXIT_FAILURE);
-              }
+          rv = (0 == mpz_set_str (arg, optarg, 10));
+          if (!rv)
+            {
+              fputs ("bad --error-check argument\n", stderr);
+              exit (EXIT_FAILURE);
+            }
 
-            if (mpz_cmp_ui (arg, UINT64_MAX) > 0)
-              {
-                fputs ("argument --error-check too large\n", stderr);
-                exit (EXIT_FAILURE);
-              }
+          if (mpz_cmp_ui (arg, UINT64_MAX) > 0)
+            {
+              fputs ("argument --error-check too large\n", stderr);
+              exit (EXIT_FAILURE);
+            }
 
-            if (mpz_cmp_ui (arg, 0) < 0)
-              {
-                fputs ("argument --error-check is negative\n", stderr);
-                exit (EXIT_FAILURE);
-              }
+          if (mpz_cmp_ui (arg, 0) < 0)
+            {
+              fputs ("argument --error-check is negative\n", stderr);
+              exit (EXIT_FAILURE);
+            }
 
-            s_error_check = mpz_get_ui (arg);
-          }
+          s_error_check = mpz_get_ui (arg);
+
           break;
         case 'p':
-          if (0 == strcmp (optarg, "LCS35-example"))
+          for (*puzzle = &challenges[0]; NULL != (*puzzle)->name; (*puzzle)++)
             {
-              *puzzle = &LCS35_example;
+              if (0 == strcmp (optarg, (*puzzle)->name))
+                break;
             }
-          else if (0 == strcmp (optarg, "LCS35-easy"))
-            {
-              *puzzle = &LCS35_easy;
-            }
-          else if (0 == strcmp (optarg, "LCS35"))
-            {
-              *puzzle = &LCS35;
-            }
-          else if (0 == strcmp (optarg, "CSAIL2019-example"))
-            {
-              *puzzle = &CSAIL2019_example;
-            }
-          else if (0 == strcmp (optarg, "CSAIL2019-easy"))
-            {
-              *puzzle = &CSAIL2019_easy;
-            }
-          else if (0 == strcmp (optarg, "CSAIL2019"))
-            {
-              *puzzle = &CSAIL2019;
-            }
-          else
+
+          if (NULL == (*puzzle)->name)
             {
               fputs ("argument --puzzle is unknown\n", stderr);
               exit (EXIT_FAILURE);
             }
+
           break;
         default:
           fputs ("unknown option\n", stderr);
@@ -190,7 +173,7 @@ main (int argc, char *argv[])
   bool rv;
   mpz_t n, z, w, w2, message;
   uint64_t s, t;
-  const challenge *puzzle = &LCS35_easy;
+  const challenge *puzzle = &challenges[0];
 
   /* Initializations */
   mpz_inits (n, z, w, w2, message, NULL);
@@ -198,6 +181,9 @@ main (int argc, char *argv[])
   mpz_set_ui (w, 2);
   s = 0;
   parse_options (argc, argv, &s, w, &puzzle);
+
+  printf ("puzzle: %s\n", puzzle->name);
+
   t = puzzle->T - s;
 
   rv = (0 == mpz_set_str (n, puzzle->N, 10));
