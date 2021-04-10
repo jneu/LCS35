@@ -16,11 +16,11 @@ TARGETS := lcs35 validate_challenge
 
 L_OBJECTS := lcs35.o
 VC_OBJECTS := validate_challenge.o parse_challenge_message.o
-COMMON_OBJECTS := print_challenge_message.o
+COMMON_OBJECTS := challenge.o print_challenge_message.o
 
-L_SOURCES := $(patsubst $(TARGETDIR)/%.o,$(C_SRCDIR)/%.c,$(L_OBJECTS))
-VC_SOURCES := $(patsubst $(TARGETDIR)/%.o,$(C_SRCDIR)/%.c,$(VC_OBJECTS))
-COMMON_SOURCES := $(patsubst $(TARGETDIR)/%.o,$(C_SRCDIR)/%.c,$(COMMON_OBJECTS))
+L_SOURCES := $(patsubst %.o,%.c,$(L_OBJECTS))
+VC_SOURCES := $(patsubst %.o,%.c,$(VC_OBJECTS))
+COMMON_SOURCES := $(patsubst %.o,%.c,$(COMMON_OBJECTS))
 HEADERS := lcs35.h challenge.h print_challenge_message.h parse_challenge_message.h
 SOURCES := $(addprefix $(C_SRCDIR)/,$(L_SOURCES) $(VC_SOURCES) $(COMMON_SOURCES) $(HEADERS))
 

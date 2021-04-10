@@ -14,13 +14,13 @@
 static uint64_t s_error_check = 0;
 
 static void
-parse_options (int argc, char *argv[], uint64_t * s, mpz_t w)
+parse_options (int argc, char *argv[], uint64_t * s, mpz_t w, const challenge ** puzzle)
 {
-  static struct option options[2] = {
+  static struct option options[3] = {
     {"error-check", required_argument, NULL, 'e'},
+    {"puzzle", required_argument, NULL, 'p'},
     {NULL, 0, NULL, 0}
   };
-  int c;
   bool rv;
   mpz_t arg;
 
@@ -28,7 +28,9 @@ parse_options (int argc, char *argv[], uint64_t * s, mpz_t w)
 
   while (true)
     {
-      c = getopt_long (argc, argv, "e:", options, NULL);
+      int c;
+
+      c = getopt_long (argc, argv, "e:p:", options, NULL);
       if (-1 == c)
         break;
 
@@ -58,7 +60,39 @@ parse_options (int argc, char *argv[], uint64_t * s, mpz_t w)
             s_error_check = mpz_get_ui (arg);
           }
           break;
+        case 'p':
+          if (0 == strcmp (optarg, "LCS35-example"))
+            {
+              *puzzle = &LCS35_example;
+            }
+          else if (0 == strcmp (optarg, "LCS35-easy"))
+            {
+              *puzzle = &LCS35_easy;
+            }
+          else if (0 == strcmp (optarg, "LCS35"))
+            {
+              *puzzle = &LCS35;
+            }
+          else if (0 == strcmp (optarg, "CSAIL2019-example"))
+            {
+              *puzzle = &CSAIL2019_example;
+            }
+          else if (0 == strcmp (optarg, "CSAIL2019-easy"))
+            {
+              *puzzle = &CSAIL2019_easy;
+            }
+          else if (0 == strcmp (optarg, "CSAIL2019"))
+            {
+              *puzzle = &CSAIL2019;
+            }
+          else
+            {
+              fputs ("argument --puzzle is unknown\n", stderr);
+              exit (EXIT_FAILURE);
+            }
+          break;
         default:
+          fputs ("unknown option\n", stderr);
           exit (EXIT_FAILURE);
         }
     }
@@ -147,6 +181,7 @@ error_check (uint64_t s, const mpz_t w)
   printf ("%" PRIu64 " ", s);
   mpz_out_str (stdout, 10, w);
   putchar ('\n');
+  putchar ('\n');
 }
 
 int
@@ -155,18 +190,19 @@ main (int argc, char *argv[])
   bool rv;
   mpz_t n, z, w, w2, message;
   uint64_t s, t;
+  const challenge *puzzle = &LCS35_easy;
 
   /* Initializations */
   mpz_inits (n, z, w, w2, message, NULL);
 
   mpz_set_ui (w, 2);
   s = 0;
-  parse_options (argc, argv, &s, w);
-  t = T - s;
+  parse_options (argc, argv, &s, w, &puzzle);
+  t = puzzle->T - s;
 
-  rv = (0 == mpz_set_str (n, N, 10));
+  rv = (0 == mpz_set_str (n, puzzle->N, 10));
   ASSERT_FATAL (rv, "failed to set n");
-  rv = (0 == mpz_set_str (z, Z, 10));
+  rv = (0 == mpz_set_str (z, puzzle->Z, 10));
   ASSERT_FATAL (rv, "failed to set z");
 
   /* Get going */

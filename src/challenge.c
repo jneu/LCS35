@@ -1,7 +1,15 @@
 #include "lcs35.h"
 
+/*
+ * Prime lengths from the two puzzles
+ */
+
 #define PRIME_LENGTH_LCS35 1024
 #define PRIME_LENGTH_CSAIL2019 1536
+
+/*
+ * The puzzle parameters proper
+ */
 
 challenge LCS35_example = {
   10,
@@ -23,7 +31,7 @@ challenge CSAIL2019_example = {
 
 /* *INDENT-OFF* */
 
-challenge LCS35_EASY = {
+challenge LCS35_easy = {
   16000,
   PRIME_LENGTH_LCS35,
   "305296071916529226878410160190393980329083590352980849937954"
@@ -62,7 +70,7 @@ challenge LCS35_EASY = {
   "45565030972017"
 };
 
-challenge CSAIL2019_EASY = {
+challenge CSAIL2019_easy = {
   16384,
   PRIME_LENGTH_CSAIL2019,
   "225420822165661554037627745680359301463248282858972568800777"

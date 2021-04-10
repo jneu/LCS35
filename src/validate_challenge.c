@@ -2,6 +2,72 @@
 #include "parse_challenge_message.h"
 #include "print_challenge_message.h"
 
+/*
+ * How sure should we be that a number is prime?
+ */
+
+#define NUM_PRIME_REPS 40
+
+/*
+ * Options
+ */
+
+static void
+parse_options (int argc, char *argv[], const challenge ** puzzle)
+{
+  static struct option options[2] = {
+    {"puzzle", required_argument, NULL, 'p'},
+    {NULL, 0, NULL, 0}
+  };
+
+  while (true)
+    {
+      int c;
+
+      c = getopt_long (argc, argv, "e:p:", options, NULL);
+      if (-1 == c)
+        break;
+
+      switch (c)
+        {
+        case 'p':
+          if (0 == strcmp (optarg, "LCS35-example"))
+            {
+              *puzzle = &LCS35_example;
+            }
+          else if (0 == strcmp (optarg, "LCS35-easy"))
+            {
+              *puzzle = &LCS35_easy;
+            }
+          else if (0 == strcmp (optarg, "LCS35"))
+            {
+              *puzzle = &LCS35;
+            }
+          else if (0 == strcmp (optarg, "CSAIL2019-example"))
+            {
+              *puzzle = &CSAIL2019_example;
+            }
+          else if (0 == strcmp (optarg, "CSAIL2019-easy"))
+            {
+              *puzzle = &CSAIL2019_easy;
+            }
+          else if (0 == strcmp (optarg, "CSAIL2019"))
+            {
+              *puzzle = &CSAIL2019;
+            }
+          else
+            {
+              fputs ("argument --puzzle is unknown\n", stderr);
+              exit (EXIT_FAILURE);
+            }
+          break;
+        default:
+          fputs ("unknown option\n", stderr);
+          exit (EXIT_FAILURE);
+        }
+    }
+}
+
 static void
 validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
 {
@@ -109,7 +175,7 @@ run_challenge (mpz_t w, uint64_t t, const mpz_t p, const mpz_t q, const mpz_t n)
 }
 
 static void
-recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q)
+recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q, int prime_length)
 {
   mpz_t seed, big_2, w;
 
@@ -122,7 +188,7 @@ recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q)
     }
 
   mpz_set_ui (w, 5);
-  mpz_ui_pow_ui (big_2, 2, 1024);
+  mpz_ui_pow_ui (big_2, 2, prime_length);
   mpz_powm (w, w, seed, big_2);
   mpz_nextprime (w, w);
 
@@ -144,37 +210,39 @@ recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q)
 }
 
 int
-main (void)
+main (int argc, char *argv[])
 {
   bool rv;
   mpz_t n, z, p, q, w, message;
-  uint64_t t = T;
+  const challenge *puzzle = &LCS35_easy;
 
   /* We need to check this somewhere... */
   assert ((64 / 8) == sizeof (mp_limb_t));
 
+  parse_options (argc, argv, &puzzle);
+
   /* Initialize the challenge values */
   mpz_inits (n, z, p, q, w, message, NULL);
 
-  rv = (0 == mpz_set_str (n, N, 10));
+  rv = (0 == mpz_set_str (n, puzzle->N, 10));
   ASSERT_FATAL (rv, "failed to set n");
-  rv = (0 == mpz_set_str (z, Z, 10));
+  rv = (0 == mpz_set_str (z, puzzle->Z, 10));
   ASSERT_FATAL (rv, "failed to set z");
-  rv = (0 == mpz_set_str (p, P, 10));
+  rv = (0 == mpz_set_str (p, puzzle->P, 10));
   ASSERT_FATAL (rv, "failed to set p");
-  rv = (0 == mpz_set_str (q, Q, 10));
+  rv = (0 == mpz_set_str (q, puzzle->Q, 10));
   ASSERT_FATAL (rv, "failed to set q");
 
   validate_challenge (n, p, q);
 
   /* Now do the hard work of running the challenge */
-  run_challenge (w, t, p, q, n);
+  run_challenge (w, puzzle->T, p, q, n);
 
   mpz_xor (message, z, w);
   print_challenge_message (message);
 
   /* Try to recover p or q */
-  recover_p_from_seed (message, p, q);
+  recover_p_from_seed (message, p, q, puzzle->prime_length);
 
   /* Clean up */
   mpz_clears (n, z, p, q, w, message, NULL);

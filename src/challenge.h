@@ -2,12 +2,6 @@
 #define CHALLENGE_H
 
 /*
- * How sure should we be that a number is prime?
- */
-
-#define DEFAULT_NUM_PRIME_REPS 40
-
-/*
  * Define the challenge parameters
  */
 
@@ -22,5 +16,12 @@ typedef struct def_challenge
 
   const char *Z;
 } challenge;
+
+extern challenge LCS35_example;
+extern challenge LCS35_easy;
+extern challenge LCS35;
+extern challenge CSAIL2019_example;
+extern challenge CSAIL2019_easy;
+extern challenge CSAIL2019;
 
 #endif
