@@ -1,5 +1,6 @@
 #include "lcs35.h"
 #include "challenge.h"
+#include "math.h"
 #include "parse_challenge_message.h"
 #include "print_challenge_message.h"
 
@@ -7,7 +8,7 @@
  * How sure should we be that a number is prime?
  */
 
-#define NUM_PRIME_REPS 40
+#define NUM_PRIME_ITERATIONS 40
 
 /*
  * Options
@@ -40,7 +41,7 @@ parse_options (int argc, char *argv[], const challenge ** puzzle)
 
           if (NULL == (*puzzle)->name)
             {
-              fputs ("argument --puzzle is unknown\n", stderr);
+              fputs ("the argument to --puzzle is unknown\n", stderr);
               exit (EXIT_FAILURE);
             }
 
@@ -93,14 +94,14 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
       exit (EXIT_FAILURE);
     }
 
-  rv = mpz_probab_prime_p (p, NUM_PRIME_REPS);
+  rv = mpz_probab_prime_p (p, NUM_PRIME_ITERATIONS);
   if (2 == rv)
     {
       puts ("p is definitely prime");
     }
   else if (1 == rv)
     {
-      printf ("p is probably prime (%d reps)\n", NUM_PRIME_REPS);
+      printf ("p is probably prime (%d iterations)\n", NUM_PRIME_ITERATIONS);
     }
   else
     {
@@ -108,14 +109,14 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
       exit (EXIT_FAILURE);
     }
 
-  rv = mpz_probab_prime_p (q, NUM_PRIME_REPS);
+  rv = mpz_probab_prime_p (q, NUM_PRIME_ITERATIONS);
   if (2 == rv)
     {
       puts ("q is definitely prime");
     }
   else if (1 == rv)
     {
-      printf ("q is probably prime (%d reps)\n", NUM_PRIME_REPS);
+      printf ("q is probably prime (%d iterations)\n", NUM_PRIME_ITERATIONS);
     }
   else
     {
@@ -140,22 +141,18 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
 static void
 run_challenge (mpz_t w, uint64_t t, const mpz_t p, const mpz_t q, const mpz_t n)
 {
-  mpz_t p_minus_1, q_minus_1, phi;
+  mpz_t lambda_n;
   mpz_t two, tmp;
 
-  mpz_inits (p_minus_1, q_minus_1, phi, two, tmp, NULL);
+  mpz_inits (lambda_n, two, tmp, NULL);
 
-  /* Compute the Euler totient of p * q, assuming both are prime */
-  mpz_sub_ui (p_minus_1, p, 1);
-  mpz_sub_ui (q_minus_1, q, 1);
-  mpz_mul (phi, p_minus_1, q_minus_1);
+  carmichael_pq_unchecked (lambda_n, p, q);
 
-  /* Use Euler's Theorem to compute the challenge value */
   mpz_set_ui (two, 2);
-  mpz_powm_ui (tmp, two, t, phi);
+  mpz_powm_ui (tmp, two, t, lambda_n);
   mpz_powm (w, two, tmp, n);
 
-  mpz_clears (two, p_minus_1, q_minus_1, phi, tmp, NULL);
+  mpz_clears (two, lambda_n, tmp, NULL);
 }
 
 static void
