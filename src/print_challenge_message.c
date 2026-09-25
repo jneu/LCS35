@@ -2,14 +2,12 @@
 #include "print_challenge_message.h"
 
 void
-print_challenge_message (mpz_t message)
+print_challenge_message (const mpz_t message)
 {
   size_t offset;
   const uint8_t *raw_bytes;
 
   puts ("message:");
-  mpz_out_str (stdout, 10, message);
-  putchar ('\n');
 
   offset = mpz_size (message) * sizeof (mp_limb_t);
   raw_bytes = (const uint8_t *) mpz_limbs_read (message);

@@ -5,6 +5,6 @@
  * Print the challenge message
  */
 
-void print_challenge_message (mpz_t message);
+void print_challenge_message (const mpz_t message);
 
 #endif

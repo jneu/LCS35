@@ -61,34 +61,56 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
 
   mpz_inits (gcd, pq, NULL);
 
-  if (0 != mpz_odd_p (p))
+  puts ("validation:");
+
+  if (0 < mpz_cmp_ui (p, 2))
     {
-      puts ("p is odd");
+      puts (" - p is greater than 2");
     }
   else
     {
-      puts ("p is even");
+      puts (" - p is not greater than 2");
+      exit (EXIT_FAILURE);
+    }
+
+  if (0 < mpz_cmp_ui (q, 2))
+    {
+      puts (" - q is greater than 2");
+    }
+  else
+    {
+      puts (" - q is not greater than 2");
+      exit (EXIT_FAILURE);
+    }
+
+  if (0 != mpz_odd_p (p))
+    {
+      puts (" - p is odd");
+    }
+  else
+    {
+      puts (" - p is even");
       exit (EXIT_FAILURE);
     }
 
   if (0 != mpz_odd_p (q))
     {
-      puts ("q is odd");
+      puts (" - q is odd");
     }
   else
     {
-      puts ("q is even");
+      puts (" - q is even");
       exit (EXIT_FAILURE);
     }
 
   mpz_gcd (gcd, p, q);
   if (0 == mpz_cmp_ui (gcd, 1))
     {
-      puts ("p and q are relatively prime");
+      puts (" - p and q are relatively prime; in particular, they are distinct");
     }
   else
     {
-      puts ("p and q are not relatively prime; their gcd is:");
+      printf (" - p and q are not relatively prime; their gcd is: ");
       mpz_out_str (stdout, 10, gcd);
       putchar ('\n');
       exit (EXIT_FAILURE);
@@ -97,41 +119,41 @@ validate_challenge (const mpz_t n, const mpz_t p, const mpz_t q)
   rv = mpz_probab_prime_p (p, NUM_PRIME_ITERATIONS);
   if (2 == rv)
     {
-      puts ("p is definitely prime");
+      puts (" - p is definitely prime");
     }
   else if (1 == rv)
     {
-      printf ("p is probably prime (%d iterations)\n", NUM_PRIME_ITERATIONS);
+      printf (" - p is probably prime (%d iterations)\n", NUM_PRIME_ITERATIONS);
     }
   else
     {
-      puts ("p is definitely not prime");
+      puts (" - p is definitely not prime");
       exit (EXIT_FAILURE);
     }
 
   rv = mpz_probab_prime_p (q, NUM_PRIME_ITERATIONS);
   if (2 == rv)
     {
-      puts ("q is definitely prime");
+      puts (" - q is definitely prime");
     }
   else if (1 == rv)
     {
-      printf ("q is probably prime (%d iterations)\n", NUM_PRIME_ITERATIONS);
+      printf (" - q is probably prime (%d iterations)\n", NUM_PRIME_ITERATIONS);
     }
   else
     {
-      puts ("q is definitely not prime");
+      puts (" - q is definitely not prime");
       exit (EXIT_FAILURE);
     }
 
   mpz_mul (pq, p, q);
   if (0 == mpz_cmp (pq, n))
     {
-      puts ("p * q is equal to n");
+      puts (" - p * q is equal to n");
     }
   else
     {
-      puts ("p * q is not equal to n");
+      puts (" - p * q is not equal to n");
       exit (EXIT_FAILURE);
     }
 
@@ -156,44 +178,58 @@ run_challenge (mpz_t w, uint64_t t, const mpz_t p, const mpz_t q, const mpz_t n)
 }
 
 static void
-recover_p_from_seed (const mpz_t message, const mpz_t p, const mpz_t q, int prime_length)
+recover_prime_from_seed (const mpz_t message, const mpz_t p, const mpz_t q, int prime_length)
 {
   mpz_t seed, big_2, w;
 
   mpz_inits (seed, big_2, w, NULL);
 
-  if (!parse_challenge_message (seed, message))
+  if (parse_challenge_message (seed, message))
     {
-      puts ("failed to parse challenge message");
-      exit (EXIT_FAILURE);
-    }
+      mpz_set_ui (w, 5);
+      mpz_ui_pow_ui (big_2, 2, prime_length);
+      mpz_powm (w, w, seed, big_2);
+      mpz_nextprime (w, w);
 
-  mpz_set_ui (w, 5);
-  mpz_ui_pow_ui (big_2, 2, prime_length);
-  mpz_powm (w, w, seed, big_2);
-  mpz_nextprime (w, w);
-
-  if (0 == mpz_cmp (w, p))
-    {
-      puts ("message seed gives p");
-    }
-  else if (0 == mpz_cmp (w, q))
-    {
-      puts ("message seed gives q");
+      if (0 == mpz_cmp (w, p))
+        {
+          puts (" - message seed gives p");
+        }
+      else if (0 == mpz_cmp (w, q))
+        {
+          puts (" - message seed gives q");
+        }
+      else
+        {
+          puts (" - failed to find p or q from message seed");
+        }
     }
   else
     {
-      puts ("failed to find p or q from message seed");
-      exit (EXIT_FAILURE);
+      puts (" - failed to parse challenge message");
     }
 
   mpz_clears (seed, big_2, w, NULL);
 }
 
+static void
+initialize_challenge_values (const challenge * puzzle, mpz_t * n, mpz_t * z, mpz_t * p, mpz_t * q)
+{
+  bool rv;
+
+  rv = (0 == mpz_set_str (*n, puzzle->N, 10));
+  ASSERT_FATAL (rv, "failed to set n");
+  rv = (0 == mpz_set_str (*z, puzzle->Z, 10));
+  ASSERT_FATAL (rv, "failed to set z");
+  rv = (0 == mpz_set_str (*p, puzzle->P, 10));
+  ASSERT_FATAL (rv, "failed to set p");
+  rv = (0 == mpz_set_str (*q, puzzle->Q, 10));
+  ASSERT_FATAL (rv, "failed to set q");
+}
+
 int
 main (int argc, char *argv[])
 {
-  bool rv;
   mpz_t n, z, p, q, w, message;
   const challenge *puzzle = &challenges[0];
 
@@ -203,31 +239,22 @@ main (int argc, char *argv[])
   parse_options (argc, argv, &puzzle);
 
   printf ("puzzle: %s\n", puzzle->name);
+  putchar ('\n');
 
-  /* Initialize the challenge values */
   mpz_inits (n, z, p, q, w, message, NULL);
 
-  rv = (0 == mpz_set_str (n, puzzle->N, 10));
-  ASSERT_FATAL (rv, "failed to set n");
-  rv = (0 == mpz_set_str (z, puzzle->Z, 10));
-  ASSERT_FATAL (rv, "failed to set z");
-  rv = (0 == mpz_set_str (p, puzzle->P, 10));
-  ASSERT_FATAL (rv, "failed to set p");
-  rv = (0 == mpz_set_str (q, puzzle->Q, 10));
-  ASSERT_FATAL (rv, "failed to set q");
+  initialize_challenge_values (puzzle, &n, &z, &p, &q);
 
   validate_challenge (n, p, q);
+  putchar ('\n');
 
-  /* Now do the hard work of running the challenge */
   run_challenge (w, puzzle->T, p, q, n);
 
   mpz_xor (message, z, w);
   print_challenge_message (message);
 
-  /* Try to recover p or q */
-  recover_p_from_seed (message, p, q, puzzle->prime_length);
+  recover_prime_from_seed (message, p, q, puzzle->prime_length);
 
-  /* Clean up */
   mpz_clears (n, z, p, q, w, message, NULL);
 
   return EXIT_SUCCESS;
